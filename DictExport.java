@@ -21,23 +21,29 @@ import java.nio.charset.Charset;
 public class DictExport {
     
     private String fileName = "dict.txt";
+    private String dbName = "dict";
     private String selectedColl = "";
     private MongoClient mongoClient;
     private DB db;
     private DBCollection selectedCollection;
     private String l = "";
     
-    public DictExport(String dictFile) {
+    public DictExport(String dictFile, String dbName) {
         if(dictFile != null) {
             this.fileName = dictFile;
         }
+
+        if(dbName != null) {
+            this.dbName = dbName;
+        }
+
         try {
-            this.mongoClient = new MongoClient( "localhost" , 27000 );
+            this.mongoClient = new MongoClient( "localhost" , 27017 );
         } catch (UnknownHostException ex) {
             System.err.println(ex);
             System.exit(1);
         }
-            this.db = mongoClient.getDB("dict2");
+            this.db = mongoClient.getDB(this.dbName);
             this.db.dropDatabase();
         try {
             this.importByLine();
@@ -90,9 +96,17 @@ public class DictExport {
     
     public static void main( String args[] ){
         String dictFile = null;
-        if(args.length > 0) {
+        String dbName = null;
+        if(args.length > 0 && args.length == 1) {
             dictFile = args[0];
         }
-        DictExport dictObj = new DictExport(dictFile);
+
+        if(args.length > 0 && args.length == 2) {
+            dbName = args[1];
+        }
+
+
+
+        DictExport dictObj = new DictExport(dictFile, dbName);
    }
 }
